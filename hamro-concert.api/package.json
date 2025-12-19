@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "prepare": "cd .. && husky install hamro-concert.api/.husky",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
@@ -19,6 +20,8 @@
     "@typescript-eslint/parser": "^8.50.0",
     "eslint": "^9.39.2",
     "eslint-plugin-import": "^2.32.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^16.2.7",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"

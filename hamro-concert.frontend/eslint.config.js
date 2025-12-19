@@ -1,23 +1,35 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import { defineConfig, globalIgnores } from 'eslint/config'
+import js from "@eslint/js";
+import globals from "globals";
 
-export default defineConfig([
-  globalIgnores(['dist']),
+export default [
+  // 1. Use recommended JS rules
+  js.configs.recommended,
+
   {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-    ],
+    // 2. Define which files to lint
+    files: ["src/**/*.{js,mjs,cjs,ts}"],
+    
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      ecmaVersion: "latest",
+      sourceType: "module",
+      // 3. Define environment (Node.js)
+      globals: {
+        ...globals.node,
+        ...globals.jest // Add this if you use Jest for testing
+      },
+    },
+    
+    // 4. Custom Rules
+    rules: {
+      "no-unused-vars": "warn",
+      "no-console": "off",
+      "prefer-const": "error",
+      "no-undef": "error"
     },
   },
-])
+  
+  // 5. Ignore specific directories (formerly .eslintignore)
+  {
+    ignores: ["node_modules/", "dist/", "build/"]
+  }
+];

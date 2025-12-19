@@ -2,12 +2,13 @@
   "name": "hamro-concert.api",
   "version": "1.0.0",
   "main": "index.js",
+  "type":"module",
   "scripts": {
-    "prepare": "cd .. && husky install hamro-concert.api/.husky",
+    "prepare": "cd .. && husky install",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "lint": "eslint src/**/*.{ts,tsx,js,jsx}"
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -24,7 +25,8 @@
     "lint-staged": "^16.2.7",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.0"
   },
   "dependencies": {
     "dotenv": "^17.2.3",

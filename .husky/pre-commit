@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/husky.sh"
+
+echo "🛡️ Starting Pre-commit Checks..."
+
+# 1. Run Backend Lint
+echo "Checking Backend (API)..."
+npm run lint --prefix hamro-concert.api || exit 1
+
+# 2. Run Frontend Lint
+echo "Checking Frontend..."
+npm run lint --prefix hamro-concert.frontend || exit 1
+
+echo "✅ All checks passed. Committing code..."

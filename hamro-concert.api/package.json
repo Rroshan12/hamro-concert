@@ -2,7 +2,6 @@
   "name": "hamro-concert.api",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "prepare": "cd .. && husky install",
     "dev": "nodemon src/index.ts",

@@ -1,13 +1,15 @@
-import express, { Request, Response } from "express";
+// src/app.ts
+import express from "express";
+import routes from "./routes";
 import { Config } from "./Config";
 
 const app = express();
 app.use(express.json());
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Node + TypeScript API running");
-});
+// Use the consolidated routes
+app.use("/", routes);
 
-app.listen(Config.PORT, () => {
-  console.log("Server running on http://localhost:3000");
+app.listen(Config.PORT
+  , () => {
+  console.log("Server running on port 3000");
 });

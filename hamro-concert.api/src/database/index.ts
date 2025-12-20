@@ -10,4 +10,12 @@ const pool = new Pool({
   database: Config.DB.NAME,
 });
 
-export const db = drizzle(pool);
+export const db = drizzle(pool, {
+  logger: {
+    logQuery: (query, params) => {
+      console.log("[SQL]:", query);
+      console.log("[Params]:", params);
+    },
+  },
+});
+

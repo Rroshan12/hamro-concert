@@ -5,16 +5,35 @@ import { Concert } from "../model/Concert";
 import { db } from "../database";
 import { concerts } from "../database/schema/concert.schema";
 import { randomUUID } from "crypto";
+import { paginate, PaginatedResult } from "../helper/pagination";
 
 export class ConcertRepository implements IConcertRepository {
+  private db = db;
+    getBaseQuery() {
+    return this.db
+      .select({
+        id: concerts.id,
+        title: concerts.title,
+        artist: concerts.artist,
+        date: concerts.date,
+        time: concerts.time,
+        venue: concerts.venue,
+        city: concerts.city,
+        image: concerts.image,
+        description: concerts.description,
+      })
+      .from(concerts);
+  }
   async findById(id: string): Promise<Concert | null> {
     const [concert] = await db.select().from(concerts).where(eq(concerts.id, id));
     return concert ?? null;
   }
 
-  async findAll(): Promise<Concert[]> {
-    return db.select().from(concerts);
+   async findAll(page = 1, limit = 10): Promise<PaginatedResult<Concert>> {
+    const query = this.getBaseQuery();
+    return paginate<Concert>(this.db, query, concerts, page, limit);
   }
+
 
   async create(concert: Omit<Concert, "id">): Promise<Concert> {
     const concertToInsert = {

@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { Request, Response } from "express";
 import { ConcertService } from "../services/ConcertService";
+import { PaginatedResult } from "../helper/pagination";
+import { ConcertVM } from "../viewmodel/ConcertVM";
 
 export class ConcertController {
   constructor(private concertService: ConcertService) {}
@@ -14,10 +16,12 @@ export class ConcertController {
     }
   };
 
-  getAll = async (_req: Request, res: Response) => {
-    const concerts = await this.concertService.getConcerts();
-    res.json(concerts);
-  };
+ getAll = async (req: Request, res: Response) => {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const result: PaginatedResult<ConcertVM> = await this.concertService.getConcerts(page, limit);
+    res.json(result);
+  }
 
   getById = async (req: Request, res: Response) => {
     const concert = await this.concertService.getConcertById(req.params.id);

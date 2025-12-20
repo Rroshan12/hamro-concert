@@ -9,7 +9,8 @@
     "start": "node dist/index.js",
     "lint": "eslint .",
     "migrate:generate": "drizzle-kit generate",
-    "migrate:update-database": "drizzle-kit migrate"
+    "migrate:update-database": "drizzle-kit migrate",
+    "test:concurrency": "node src/test/test-concurrent-booking.mjs"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.3",
     "@types/pg": "^8.16.0",
+    "@types/swagger-ui-express": "^4.1.8",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
     "drizzle-kit": "^0.31.8",
@@ -32,9 +34,12 @@
     "typescript-eslint": "^8.50.0"
   },
   "dependencies": {
+    "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.1",
     "express": "^5.2.1",
-    "pg": "^8.16.3"
+    "openapi-types": "^12.1.3",
+    "pg": "^8.16.3",
+    "swagger-ui-express": "^5.0.1"
   }
 }

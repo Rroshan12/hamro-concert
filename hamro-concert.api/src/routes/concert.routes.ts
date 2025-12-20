@@ -13,7 +13,7 @@ const concertController = new ConcertController(concertService);
 router.post("/", concertController.create);
 router.get("/", concertController.getAll);
 router.get("/:id", concertController.getById);
-router.put("/:id", concertController.update);
+router.put("/", concertController.update);
 router.delete("/:id", concertController.delete);
 
 export default router;

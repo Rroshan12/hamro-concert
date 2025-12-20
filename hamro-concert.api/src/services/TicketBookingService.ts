@@ -21,7 +21,8 @@ export class TicketBookingService {
           if (attempt < maxAttempts) continue;
         }
         throw err;
-      }
+      } 
+      
     }
     // Unreachable, but for type completeness
     throw new Error("Transaction retry exhausted");

@@ -50,13 +50,7 @@ export class TicketTierRepository implements ITicketTierRepository {
   async update(ticketTier: TicketTier): Promise<TicketTier | null> {
     const [updated] = await db
       .update(ticketTiers)
-      .set({
-        concertId: ticketTier.concertId,
-        ticketTypeId: ticketTier.ticketTypeId,
-        price: ticketTier.price,
-        total: ticketTier.total,
-        available: ticketTier.available,
-      })
+      .set(ticketTier)
       .where(eq(ticketTiers.id, ticketTier.id))
       .returning();
     return (updated as TicketTier) ?? null;

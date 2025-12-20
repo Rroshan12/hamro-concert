@@ -53,3 +53,7 @@ Thumbs.db
 *.tmp
 *.temp
 *.swp
+
+
+# Drizzle migration artifacts (auto-generated)
+drizzle

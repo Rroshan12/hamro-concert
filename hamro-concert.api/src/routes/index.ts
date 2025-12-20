@@ -1,12 +1,13 @@
-// src/routes/index.ts
+
 import { Router } from "express";
 import concertRoutes from "./concert.routes";
-// import other routes here if needed
-// import userRoutes from "./user.routes";
+import ticketTierRoutes from "./ticketTier.routes";
+
 
 const router = Router();
 
 router.use("/concerts", concertRoutes);
-// router.use("/users", userRoutes); // add more routes as needed
+router.use("/ticket-tiers", ticketTierRoutes);
+
 
 export default router;

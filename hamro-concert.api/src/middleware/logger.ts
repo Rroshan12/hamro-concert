@@ -1,5 +1,5 @@
 // src/middleware/database-exception.middleware.ts
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { db } from "../database";
 import { exceptions } from "../database/schema/exception.schema";
 

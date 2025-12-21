@@ -14,6 +14,7 @@ Start the database using Docker:
 
 docker-compose up -d
 
+
 # Backend Setup
 Navigate to the backend folder and install dependencies:
 
@@ -23,7 +24,8 @@ npm install
 
 # Environment Variables Backend
 
-Create a `.env` file with: example is shown below
+Note:
+Create a `.env` file with: example is shown below if you use docker compose of above other wise keep your local instanse of db:
 
 PORT=3000
 
@@ -37,12 +39,14 @@ DB_PASSWORD=mypassword
 
 DB_NAME=littledb
 
+CORS_ORIGIN=http://localhost:5173
+
 
 # Start Backend
 
 npm run dev
 
-migration and seed happen automatically
+migration and seed of data happen automatically
 
 if not run :
 
@@ -85,6 +89,7 @@ node test-concurrent-seat-booking.js
 
 node test-multiple-seat-booking.js
 
+
 # Tech Stack
 Node.js, TypeScript, Drizzle ORM, Docker, PostgreSQL
 
@@ -114,8 +119,45 @@ Everything is wrapped in a Database Transaction. If any step fails from stock de
 
 
 
+# High availability (HA) and scale (discussion in README)
 
-# License
-MIT
+
+1. Database:
+
+Master-replica Postgres setup for failover.
+
+Consider multi-region read replicas.
+
+2. Backend:
+
+Horizontally scale with load balancers (e.g., multiple Node instances).
+
+Stateless backend so new instances can spin up quickly.
+
+3. Caching:
+
+Can Use Redis For Backed to cache ticket availability for fast reads.
+
+Used Frontend Based Cache also, Can use Socket for realtime cache update
+
+4. Global users:
+
+CDN for static assets (React app).
+
+TTL-based caching of ticket availability for regions to reduce DB load.
+
+
+# Performance
+
+Aim for <500ms booking request:
+
+Efficient DB queries (indexed ticket tables). indexing is done in seats/tickets 
+
+for insert if get slow can implenment like delete index before insert and recreat after insert.
+
+Minimal round trips between backend and DB.
+
+Can Use  redis caching for read-heavy endpoints (like viewing available tickets / seats).
+
 
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from './component/Header';
 import ConcertCard from './component/ConcertCard';
 import BookingModal from './component/Booking/BookingModal';
@@ -14,6 +14,10 @@ function App() {
   const [concerts, setConcerts] = useState<Concert[]>([]);
   const [ticketTiers, setTicketTiers] = useState<TicketTier[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const getTiersForConcert = useMemo(() => {
+    return (concertId: string) => ticketTiers.filter(tier => tier.concertId === concertId);
+  }, [ticketTiers]);
 
   const handleBookNow = (concert: Concert) => {
     setSelectedConcert(concert);
@@ -51,7 +55,7 @@ function App() {
                 <ConcertCard
                   key={concert.id}
                   concert={concert}
-                  tiers={ticketTiers.filter(tier => tier.concertId === concert.id)}
+                  tiers={getTiersForConcert(concert.id)}
                   onBookNow={handleBookNow}
                 />
               ))}
@@ -60,7 +64,7 @@ function App() {
       {selectedConcert && (
         <BookingModal
           concert={selectedConcert}
-          tiers={ticketTiers.filter(tier => tier.concertId === selectedConcert.id)}
+          tiers={getTiersForConcert(selectedConcert.id)}
           onClose={handleCloseModal}
         />
       )}

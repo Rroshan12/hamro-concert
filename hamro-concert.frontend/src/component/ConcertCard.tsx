@@ -8,6 +8,8 @@ interface ConcertCardProps {
 }
 
 export default function ConcertCard({ concert, tiers, onBookNow }: ConcertCardProps) {
+
+  console.log(concert,'ccccc')
   const totalAvailable = tiers.reduce((sum, tier) => sum + tier.available, 0);
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);

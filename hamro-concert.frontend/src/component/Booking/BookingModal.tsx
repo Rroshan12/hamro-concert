@@ -22,9 +22,7 @@ export default function BookingModal({
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [isBooked, setIsBooked] = useState(false);
-
-  if (!concert) return null;
-
+  
   const updateQuantity = (tierId: string, change: number) => {
     setQuantities((prev) => {
       const currentQty = prev[tierId] || 0;
@@ -73,7 +71,6 @@ const handleBooking = async (e: React.FormEvent) => {
   }
 };
 
-  console.log(quantities,'hyh');
   if (isBooked) {
     return <Confirm userEmail={userEmail} />;
   }
@@ -95,7 +92,6 @@ const handleBooking = async (e: React.FormEvent) => {
             </button>
           </div>
         </div>
-
         <form onSubmit={handleBooking} className="p-6">
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -154,14 +150,12 @@ const handleBooking = async (e: React.FormEvent) => {
               ))}
             </div>
           </div>
-
           <UserEmailInput
             userName={userName}
             setUserName={setUserName}
             userEmail={userEmail}
             setUserEmail={setUserEmail}
           />
-
           <TicketTotal totalTickets={totalTickets} totalAmount={totalAmount} />
 
           <button

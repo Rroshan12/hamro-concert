@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 import Header from './component/Header';
-import ConcertCard from './component/ConcertCard';
+import ConcertCard from './component/Concert/ConcertCard';
 import BookingModal from './component/Booking/BookingModal';
 import Footer from './component/Footer';
 import  { type Concert, type TicketTier } from './types';
 import { getConcerts } from './api/concerts';
 import { getAllTicketTiers } from './api/ticketTiers';
-import ConcertCardShimmer from './component/ConcertCardShimmer';
+import ConcertCardShimmer from './component/Concert/ConcertCardShimmer';
 import UpCommingInfo from './component/UpCommingInfo';
 import { useQuery } from '@tanstack/react-query';
 

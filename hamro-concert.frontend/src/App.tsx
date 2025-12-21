@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Header from './component/Header';
 import ConcertCard from './component/ConcertCard';
 import BookingModal from './component/Booking/BookingModal';
@@ -8,12 +8,23 @@ import { getConcerts } from './api/concerts';
 import { getAllTicketTiers } from './api/ticketTiers';
 import ConcertCardShimmer from './component/ConcertCardShimmer';
 import UpCommingInfo from './component/UpCommingInfo';
+import { useQuery } from '@tanstack/react-query';
+
 
 function App() {
   const [selectedConcert, setSelectedConcert] = useState<Concert | null>(null);
-  const [concerts, setConcerts] = useState<Concert[]>([]);
-  const [ticketTiers, setTicketTiers] = useState<TicketTier[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { data: concertsPaged, isLoading: concertsLoading } = useQuery({
+    queryKey: ['concerts', { page: 1, limit: 50 }],
+    queryFn: () => getConcerts({ page: 1, limit: 50 }),
+  });
+  const { data: tiersData, isLoading: tiersLoading } = useQuery({
+    queryKey: ['ticketTiers', 'all'],
+    queryFn: () => getAllTicketTiers(),
+  });
+
+  const concerts: Concert[] = concertsPaged?.data || [];
+  const ticketTiers: TicketTier[] = tiersData || [];
+  const loading = concertsLoading || tiersLoading;
 
   const getTiersForConcert = useMemo(() => {
     return (concertId: string) => ticketTiers.filter(tier => tier.concertId === concertId);
@@ -26,20 +37,6 @@ function App() {
   const handleCloseModal = () => {
     setSelectedConcert(null);
   };
-  useEffect(() => {
-    (async () => {
-        try {
-          const [concertPaged, tiers] = await Promise.all([
-            getConcerts({ page: 1, limit: 50 }),
-            getAllTicketTiers(),
-          ]);
-          setConcerts(concertPaged.data || []);
-          setTicketTiers(tiers || []);
-        } finally {
-          setLoading(false);
-        }
-    })();
-  }, [selectedConcert]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">

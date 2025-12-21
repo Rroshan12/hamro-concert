@@ -6,6 +6,7 @@ import Confirm from "./Confirm";
 import TicketTotal from "./TicketTotal";
 import UserEmailInput from "./UserEmailInput";
 import { createBooking, type CreateBookingPayload } from "../../api/bookings";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface BookingModalProps {
   concert: Concert | null;
@@ -18,6 +19,7 @@ export default function BookingModal({
   tiers,
   onClose,
 }: BookingModalProps) {
+  const queryClient = useQueryClient();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -53,13 +55,16 @@ const handleBooking = async (e: React.FormEvent) => {
       userName,
       userEmail,
       ticketData: Object.entries(quantities)
-        .filter(([_, quantity]) => quantity > 0)
+        .filter(([, quantity]) => quantity > 0)
         .map(([ticketTierId, quantity]) => ({
-          ticketTierId,
+          ticketTierId: Number(ticketTierId),
           quantity,
         })),
     };
     await createBooking(bookingPayload);
+    // Refresh cached lists
+    queryClient.invalidateQueries({ queryKey: ['concerts'] });
+    queryClient.invalidateQueries({ queryKey: ['ticketTiers'] });
     setIsBooked(true);
     setTimeout(() => {
       onClose();

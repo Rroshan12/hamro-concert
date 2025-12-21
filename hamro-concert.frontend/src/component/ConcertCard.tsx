@@ -1,5 +1,6 @@
-import { Calendar, Clock, MapPin, Users } from 'lucide-react';
-import  { TypeId, type Concert, type TicketTier } from '../types';
+import React from "react";
+import { Calendar, Clock, MapPin, Users } from "lucide-react";
+import { TypeId, type Concert, type TicketTier } from "../types";
 
 interface ConcertCardProps {
   concert: Concert;
@@ -7,13 +8,20 @@ interface ConcertCardProps {
   onBookNow: (concert: Concert) => void;
 }
 
-export default function ConcertCard({ concert, tiers, onBookNow }: ConcertCardProps) {
-
-  console.log(concert,'ccccc')
+const ConcertCard = React.memo(function ConcertCard({
+  concert,
+  tiers,
+  onBookNow,
+}: ConcertCardProps) {
   const totalAvailable = tiers.reduce((sum, tier) => sum + tier.available, 0);
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   return (
@@ -30,9 +38,15 @@ export default function ConcertCard({ concert, tiers, onBookNow }: ConcertCardPr
       </div>
 
       <div className="p-6">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">{concert.title}</h3>
-        <p className="text-red-700 font-semibold text-lg mb-3">{concert.artist}</p>
-        <p className="text-gray-600 text-sm mb-4">{concert.description}</p>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          {concert.title}
+        </h3>
+        <p className="text-red-700 font-semibold text-lg mb-3">
+          {concert.artist}
+        </p>
+        <p className="text-gray-600 text-sm mb-4">
+          {concert.description}
+        </p>
 
         <div className="space-y-2 mb-4">
           <div className="flex items-center text-gray-700">
@@ -45,24 +59,37 @@ export default function ConcertCard({ concert, tiers, onBookNow }: ConcertCardPr
           </div>
           <div className="flex items-center text-gray-700">
             <MapPin className="h-4 w-4 mr-2 text-red-600" />
-            <span className="text-sm">{concert.venue}, {concert.city}</span>
+            <span className="text-sm">
+              {concert.venue}, {concert.city}
+            </span>
           </div>
         </div>
 
         <div className="border-t border-gray-200 pt-4 mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-gray-500 uppercase">Ticket Tiers</span>
+            <span className="text-xs font-semibold text-gray-500 uppercase">
+              Ticket Tiers
+            </span>
           </div>
           <div className="space-y-2">
-            {tiers.map(tier => (
-              <div key={tier.id} className="flex items-center justify-between text-sm">
+            {tiers.map((tier) => (
+              <div
+                key={tier.id}
+                className="flex items-center justify-between text-sm"
+              >
                 <div className="flex items-center">
                   <Users className="h-3 w-3 mr-2 text-gray-400" />
-                  <span className="font-medium text-gray-700">{TypeId[`${tier.ticketTypeId}`]}</span>
+                  <span className="font-medium text-gray-700">
+                    {TypeId[`${tier.ticketTypeId}`]}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <span className="text-green-600 font-semibold">${tier.price}</span>
-                  <span className="text-gray-500">{tier.available}/{tier.total}</span>
+                  <span className="text-green-600 font-semibold">
+                    ${tier.price}
+                  </span>
+                  <span className="text-gray-500">
+                    {tier.available}/{tier.total}
+                  </span>
                 </div>
               </div>
             ))}
@@ -78,4 +105,6 @@ export default function ConcertCard({ concert, tiers, onBookNow }: ConcertCardPr
       </div>
     </div>
   );
-}
+});
+
+export default ConcertCard;

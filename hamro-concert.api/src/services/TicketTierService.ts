@@ -29,6 +29,12 @@ export class TicketTierService {
     return { ...paged, data: TicketTierMapper.toVMList(paged.data as any) } as any;
   }
 
+
+  async getAllNoPaginate(): Promise<TicketTier[]> {
+    const rows = await this.db.select().from(ticketTiers);
+    return rows as TicketTier[];
+  }
+
   async getById(id: number): Promise<TicketTierVM | null> {
     const item = await this.repo.findById(id);
     if (!item) return null;

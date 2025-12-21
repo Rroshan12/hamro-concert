@@ -23,6 +23,12 @@ export class TicketTierController {
     res.json(result);
   };
 
+
+  getAllNoPaginate = async (_req: Request, res: Response) => {
+    const result = await this.service.getAllNoPaginate();
+    res.json(result);
+  };
+
   getById = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const item = await this.service.getById(id);

@@ -5,6 +5,7 @@ dotenv.config();
 export const Config = {
   PORT:process.env.PORT || 3000,
   BASE_URL: process.env.BASE_URL,
+  CORS_ORIGIN: process.env.CORS_ORIGIN,
   DB: {
     HOST: process.env.DB_HOST || "localhost",
     PORT: process.env.DB_PORT || 5432,

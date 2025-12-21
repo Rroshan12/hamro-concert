@@ -113,6 +113,12 @@ const spec: OpenAPIV3.Document = {
         responses: { "204": { description: "No Content" } },
       },
     },
+    "/ticket-tiers/all": {
+      get: {
+        summary: "List all ticket tiers (no pagination)",
+        responses: { "200": { description: "OK" } },
+      },
+    },
 
     "/ticket-bookings": {
       post: {

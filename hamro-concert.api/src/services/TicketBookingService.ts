@@ -9,109 +9,95 @@ import { seats } from "../database/schema/seat.schema";
 import { TicketBookingListVM, TicketBookingVM } from "../viewmodel/TicketBookingVM";
 
 export class TicketBookingService {
-  private async runSerializable<T>(fn: (tx: any) => Promise<T>): Promise<T> {
-    // Retry on serialization failures (Postgres code 40001)
-    const maxAttempts = 3;
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        return await db.transaction(async (tx) => fn(tx), {
-          isolationLevel: "serializable" as any,
-        });
-      } catch (err: any) {
-        if (err && (err.code === "40001" || err.code === "CR000")) {
-          if (attempt < maxAttempts) continue;
-        }
-        throw err;
-      } 
-      
-    }
-    // Unreachable, but for type completeness
-    throw new Error("Transaction retry exhausted");
-  }
-
   async bookSeats(vm: { userName: string; userEmail: string; seatIds: number[] }): Promise<TicketBookingVM> {
-    return await this.runSerializable(async (tx) => {
-      // 1) Find or create user
-      let userId: string;
-      const existing = await tx.select().from(users).where(eq(users.email, vm.userEmail));
-      if (existing.length > 0) {
-        userId = existing[0].id;
-      } else {
-        userId = randomUUID();
-        await tx.insert(users).values({ id: userId, name: vm.userName, email: vm.userEmail });
+    // Using default 'read committed' isolation because we are manually 
+    // managing locks via FOR UPDATE for multi-instance safety.
+    return await db.transaction(async (tx) => {
+      
+      // 1) ATOMIC USER UPSERT
+      // Prevents unique constraint errors if two instances create the same user.
+      const [user] = await tx
+        .insert(users)
+        .values({ id: randomUUID(), name: vm.userName, email: vm.userEmail })
+        .onConflictDoUpdate({
+          target: users.email,
+          set: { name: vm.userName },
+        })
+        .returning();
+
+      const userId: string = user.id;
+
+      if (!vm.seatIds || vm.seatIds.length === 0) {
+        throw Object.assign(new Error("No seats provided"), { status: 400 });
       }
 
-      if (!Array.isArray(vm.seatIds) || vm.seatIds.length === 0) {
-        const err: any = new Error("seatIds must be a non-empty array");
-        err.status = 400;
-        throw err;
+      // 2) PESSIMISTIC LOCKING - SEATS
+      // Instance B will hang here until Instance A commits.
+      const seatsToBook = await tx.execute(sql`
+        SELECT * FROM ${seats} 
+        WHERE ${seats.id} IN (${sql.join(vm.seatIds, sql`, `)}) 
+        FOR UPDATE
+      `).then((res: any) => res.rows as any[]);
+
+      // Helper to handle raw DB names (snake_case) vs Drizzle names (camelCase)
+      const getVal = (obj: any, camel: string, snake: string) => obj[camel] !== undefined ? obj[camel] : obj[snake];
+
+      // 3) VALIDATION AFTER LOCK
+      // If Instance A just finished, Instance B wakes up and finds these are now 'true'
+      if (!seatsToBook || seatsToBook.length !== vm.seatIds.length) {
+        throw Object.assign(new Error("Some seats could not be found"), { status: 404 });
       }
 
-      // 2) Check if seats are available and get seat details
-      const seatsToBook = await tx
-        .select()
-        .from(seats)
-        .where(and(
-          inArray(seats.id, vm.seatIds),
-          eq(seats.isBooked, false)
-        ));
-
-      if (seatsToBook.length !== vm.seatIds.length) {
-        const err: any = new Error("Some seats are already booked");
-        err.status = 400;
-        throw err;
+      const isAnyBooked = seatsToBook.some(s => getVal(s, 'isBooked', 'is_booked') === true || getVal(s, 'isBooked', 'is_booked') === 1);
+      if (isAnyBooked) {
+        throw Object.assign(new Error("Some seats are already booked"), { status: 400 });
       }
 
-      // 3) Group seats by ticket tier to update ticket tiers
-      const tierGroups = seatsToBook.reduce((acc: Record<number, typeof seatsToBook>, seat: any) => {
-        if (!acc[seat.ticketTierId]) {
-          acc[seat.ticketTierId] = [];
-        }
-        acc[seat.ticketTierId].push(seat);
-        return acc;
-      }, {} as Record<number, typeof seatsToBook>);
+      // 4) GROUP BY TIER & LOCK TIERS
+      const tierIds = [...new Set(seatsToBook.map(s => getVal(s, 'ticketTierId', 'ticket_tier_id')))].filter(Boolean);
+
+      if (tierIds.length === 0) {
+        throw Object.assign(new Error("Invalid seat data: no tiers found"), { status: 500 });
+      }
+
+      // Lock Tiers to prevent over-selling stock
+      await tx.execute(sql`
+        SELECT id FROM ${ticketTiers} 
+        WHERE ${ticketTiers.id} IN (${sql.join(tierIds, sql`, `)}) 
+        FOR UPDATE
+      `);
 
       const items: TicketBookingListVM[] = [];
       let firstSaleId: number | null = null;
 
-      // 4) Process each ticket tier group
-      for (const [ticketTierId, tierSeats] of Object.entries(tierGroups)) {
-        const tierId = Number(ticketTierId);
-        const quantity = (tierSeats as any[]).length;
+      // 5) PROCESS EACH TIER
+      for (const tierId of tierIds) {
+        const tierSeats = seatsToBook.filter(s => getVal(s, 'ticketTierId', 'ticket_tier_id') === tierId);
+        const quantity = tierSeats.length;
 
-        // Load tier
+        // Get fresh, locked tier data
         const [tier] = await tx
-          .select({ id: ticketTiers.id, concertId: ticketTiers.concertId, price: ticketTiers.price, available: ticketTiers.available })
+          .select()
           .from(ticketTiers)
-          .where(eq(ticketTiers.id, tierId));
-        
-        if (!tier) {
-          const err: any = new Error("Ticket tier not found");
-          err.status = 404;
-          throw err;
+          .where(eq(ticketTiers.id, Number(tierId)));
+
+        if (!tier || tier.available < quantity) {
+          throw Object.assign(new Error(`Insufficient tickets for tier: ${tier || tierId}`), { status: 400 });
         }
 
-        if (tier.available < quantity) {
-          const err: any = new Error("Insufficient tickets available");
-          err.status = 400;
-          throw err;
-        }
-
-        // 5) Decrement available tickets in tier
+        // 6) ATOMIC STOCK DECREMENT
         const [stockUpdated] = await tx
           .update(ticketTiers)
           .set({ available: sql`${ticketTiers.available} - ${quantity}` })
-          .where(and(eq(ticketTiers.id, tierId), gte(ticketTiers.available, quantity)))
-          .returning({ available: ticketTiers.available });
-        
+          .where(and(eq(ticketTiers.id, Number(tierId)), gte(ticketTiers.available, quantity)))
+          .returning();
+
         if (!stockUpdated) {
-          const err: any = new Error("Failed to reserve tickets. Please try again.");
-          err.status = 409;
-          throw err;
+          throw Object.assign(new Error("Conflict updating ticket availability"), { status: 409 });
         }
 
-        // 6) Mark seats as booked
-        const seatIds = (tierSeats as any[]).map((seat: any) => seat.id);
+        // 7) MARK SEATS AS BOOKED
+        const seatIdsToUpdate = tierSeats.map(s => s.id);
         await tx
           .update(seats)
           .set({
@@ -120,13 +106,9 @@ export class TicketBookingService {
             bookedAt: new Date(),
             updatedAt: new Date(),
           })
-          .where(inArray(seats.id, seatIds));
+          .where(inArray(seats.id, seatIdsToUpdate));
 
-        // 7) Create ticket sales record
-        const pricePerTicket = tier.price;
-        const totalAmount = (Number(pricePerTicket) * quantity).toFixed(2);
-        const seatNumbers = (tierSeats as any[]).map((seat: any) => seat.seatNumber);
-        
+        // 8) CREATE SALES RECORD
         const [sale] = await tx
           .insert(ticketSales)
           .values({
@@ -134,8 +116,8 @@ export class TicketBookingService {
             concertId: tier.concertId,
             ticketTierId: tier.id,
             quantity: quantity,
-            pricePerTicket: pricePerTicket,
-            totalAmount: totalAmount,
+            pricePerTicket: tier.price,
+            totalAmount: (Number(tier.price) * quantity).toFixed(2),
             status: "SUCCESS",
           })
           .returning();
@@ -150,7 +132,7 @@ export class TicketBookingService {
           totalAmount: String(sale.totalAmount),
           status: sale.status,
           createdAt: sale.createdAt,
-          seatNumbers: seatNumbers,
+          seatNumbers: tierSeats.map(s => getVal(s, 'seatNumber', 'seat_number')),
         });
       }
 
@@ -163,5 +145,4 @@ export class TicketBookingService {
       };
     });
   }
-
 }

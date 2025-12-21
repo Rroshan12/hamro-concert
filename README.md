@@ -16,7 +16,9 @@ docker-compose up -d
 
 # Backend Setup
 Navigate to the backend folder and install dependencies:
+
 cd hamro-concert.api
+
 npm install
 
 # Environment Variables Backend
@@ -24,10 +26,15 @@ npm install
 Create a `.env` file with: example is shown below
 
 PORT=3000
+
 DB_HOST=localhost
+
 DB_PORT=5432
+
 DB_USER=myuser 
+
 DB_PASSWORD=mypassword
+
 DB_NAME=littledb
 
 
@@ -36,9 +43,13 @@ DB_NAME=littledb
 npm run dev
 
 migration and seed happen automatically
+
 if not run :
+
 cd hamro-concert.api
+
 npm run  migrate:generate
+
 npm run  migrate:update-database
 
 
@@ -50,6 +61,7 @@ Navigate to the frontend folder and install dependencies:
 cd hamro-concert.frontend
 
 npm install
+
 npm run dev
 
 
@@ -70,6 +82,7 @@ cd hamro-concert.api.test
 npm install
 
 node test-concurrent-seat-booking.js
+
 node test-multiple-seat-booking.js
 
 # Tech Stack

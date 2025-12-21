@@ -7,6 +7,7 @@ import seed from "./database/seed";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger";
 import cors from "cors";
+import { execSync } from "node:child_process";
 
 const app = express();
 app.use(express.json());
@@ -29,14 +30,25 @@ app.use(databaseExceptionMiddleware)
 app.listen(Config.PORT
   , () => {
   console.log("Server running on port 3000");
-  main();
+  runMigrationsAndSeed();
 });
 
-async function main() {
+
+async function runMigrationsAndSeed() {
   try {
-    await seed(); 
-    console.log("App started!");
+    console.log("Generating migrations...");
+    execSync("npm run migrate:generate", { stdio: "inherit" });
+
+    console.log("Updating database...");
+    execSync("npm run migrate:update-database", { stdio: "inherit" });
+
+    console.log("Seeding database...");
+    await seed();
+
+    console.log("Database ready!");
   } catch (err) {
-    console.error("Error during seeding:", err);
+    console.error("Migration/Seeding failed:", err);
+    process.exit(1);
   }
 }
+

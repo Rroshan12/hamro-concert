@@ -99,57 +99,67 @@ function SeatBookingModal({ concert, ticketTiers, onClose }: SeatBookingModalPro
   }
 
   return (
-   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto backdrop-blur-sm">
-      <div className="theme-bg-surface theme-shadow-modal theme-radius-2xl max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto backdrop-blur-sm">
+      <div className="theme-bg-surface theme-shadow-modal theme-radius-2xl max-w-5xl w-full my-8 max-h-[95vh] overflow-hidden flex flex-col">
         <SeatBookingHeader concert={concert} onClose={onClose} />
-        <form onSubmit={handleBooking} className="p-6">
-          <SeatSelection 
-            seats={seats}
-            selectedSeats={selectedSeats}
-            onSeatClick={handleSeatClick}
-            loading={loading}
-            error={error}
-          />
+        <div className="flex-1 overflow-y-auto">
+          <form onSubmit={handleBooking} className="p-6 space-y-6">
+            <SeatSelection 
+              seats={seats}
+              selectedSeats={selectedSeats}
+              onSeatClick={handleSeatClick}
+              loading={loading}
+              error={error}
+            />
 
-          {/* Selected seats summary */}
-          {selectedSeats.length > 0 && (
-            <div className="mt-6 p-4 theme-bg-secondary-50 rounded-lg">
-              <h4 className="font-bold theme-text-primary mb-2">Selected Seats:</h4>
-              <div className="text-sm theme-text-secondary mb-2">
-                {selectedSeats.map(seat => seat.seatNumber).join(", ")}
+            {/* Selected seats summary */}
+            {selectedSeats.length > 0 && (
+              <div className="theme-bg-secondary-50 border-2 theme-border-primary-200 theme-radius-lg p-4">
+                <h4 className="font-bold theme-text-primary mb-3">Selected Seats:</h4>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {selectedSeats.map(seat => (
+                    <span key={seat.id} className="px-3 py-1 theme-bg-primary-100 theme-text-primary-700 theme-radius-full text-sm font-medium">
+                      {seat.seatNumber}
+                    </span>
+                  ))}
+                </div>
+                <div className="text-lg font-bold theme-text-primary">
+                  Total Seats: {selectedSeats.length}
+                </div>
               </div>
-              <div className="text-lg font-bold theme-text-primary">
-                Total Seats: {selectedSeats.length}
+            )}
+
+            <SeatTotal 
+              selectedSeats={selectedSeats}
+              ticketTiers={ticketTiers}
+            />
+
+            <div className="theme-bg-surface border-2 theme-border-primary-200 theme-radius-lg p-6">
+              <UserEmailInput
+                userName={userName}
+                setUserName={setUserName}
+                userEmail={userEmail}
+                setUserEmail={setUserEmail}
+              />
+              
+              <div className="mt-6">
+                <ButtonWrapper
+                  type="submit"
+                  disabled={selectedSeats.length === 0 || !userName || !userEmail || isBooking}
+                  className="w-full font-bold py-4 px-6 theme-radius-lg text-lg"
+                >
+                  {isBooking ? "Booking..." : `Book ${selectedSeats.length} Seat${selectedSeats.length !== 1 ? "s" : ""}`}
+                </ButtonWrapper>
               </div>
             </div>
-          )}
 
-          <SeatTotal 
-            selectedSeats={selectedSeats}
-            ticketTiers={ticketTiers}
-          />
-
-          <UserEmailInput
-            userName={userName}
-            setUserName={setUserName}
-            userEmail={userEmail}
-            setUserEmail={setUserEmail}
-          />
-
-          <ButtonWrapper
-            type="submit"
-            disabled={selectedSeats.length === 0 || !userName || !userEmail || isBooking}
-            className="font-bold py-4 px-6 theme-radius-lg"
-          >
-            {isBooking ? "Booking..." : `Book ${selectedSeats.length} Seat${selectedSeats.length !== 1 ? "s" : ""}`}
-          </ButtonWrapper>
-
-          {error && (
-            <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-              {error}
-            </div>
-          )}
-        </form>
+            {error && (
+              <div className="p-4 bg-red-50 border-2 border-red-200 theme-radius-lg">
+                <p className="text-red-700 font-medium">{error}</p>
+              </div>
+            )}
+          </form>
+        </div>
       </div>
     </div>
   );

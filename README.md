@@ -114,6 +114,10 @@ Queueing: If Instance A locks a seat, Instance B is paused by the database until
 
 Validation: Once Instance B is "released," it re-checks the seat status. It sees the updated is_booked value and returns a clean error instead of a duplicate booking.
 
+can watch implementation via
+
+https://github.com/Rroshan12/hamro-concert/blob/main/hamro-concert.api/src/services/TicketBookingService.ts
+
 # Atomic Integrity
 Everything is wrapped in a Database Transaction. If any step fails from stock decrement to sale creation—the Rollback command restores all rows. This prevents "ghost bookings" ensuring seats are only taken if the payment and inventory updates succeed simultaneously.
 

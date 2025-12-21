@@ -83,7 +83,7 @@ const handleBooking = async (e: React.FormEvent) => {
   return (
    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8">
-        <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white p-6 rounded-t-2xl">
+        <div className="bg-linear-to-r from-red-600 to-orange-600 text-white p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold mb-1">{concert.title}</h2>
@@ -91,7 +91,7 @@ const handleBooking = async (e: React.FormEvent) => {
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+              className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors cursor-pointer"
             >
               <X className="h-6 w-6" />
             </button>
@@ -133,7 +133,7 @@ const handleBooking = async (e: React.FormEvent) => {
                       <button
                         type="button"
                         onClick={() => updateQuantity(tier.id, -1)}
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full p-1 transition-colors"
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full p-1 transition-colors cursor-pointer"
                         disabled={!quantities[tier.id]}
                       >
                         <Minus className="h-4 w-4" />
@@ -144,7 +144,7 @@ const handleBooking = async (e: React.FormEvent) => {
                       <button
                         type="button"
                         onClick={() => updateQuantity(tier.id, 1)}
-                        className="bg-red-600 hover:bg-red-700 text-white rounded-full p-1 transition-colors"
+                        className="bg-red-600 hover:bg-red-700 text-white rounded-full p-1 transition-colors cursor-pointer"
                         disabled={(quantities[tier.id] || 0) >= tier.available}
                       >
                         <Plus className="h-4 w-4" />
@@ -166,7 +166,7 @@ const handleBooking = async (e: React.FormEvent) => {
           <button
             type="submit"
             disabled={totalTickets === 0 || !userName || !userEmail}
-            className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100 disabled:cursor-not-allowed"
+            className="w-full bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100 disabled:cursor-not-allowed cursor-pointer"
           >
             {totalTickets === 0
               ? "Select Tickets"

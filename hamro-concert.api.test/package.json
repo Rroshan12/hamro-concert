@@ -4,7 +4,7 @@
   "main": "index.js",
   "type":"module",
   "scripts": {
-    "test:concurrency": "node test-concurrent-booking.js"
+    "test:concurrency": "node test-concurrent-seat-booking.js"
   },
   "keywords": [],
   "author": "",

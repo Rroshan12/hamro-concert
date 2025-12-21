@@ -6,6 +6,7 @@ import TicketTotal from "./TicketTotal";
 import UserEmailInput from "./UserEmailInput";
 import BookingModalHeader from "./BookingModalHeader";
 import TicketSelection from "./TicketSelection";
+import ButtonWrapper from "../ButtonWrapper/ButtonWrapper";
 import { createBooking, type CreateBookingPayload } from "../../api/bookings";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -100,15 +101,15 @@ const handleBooking = async (e: React.FormEvent) => {
           />
           <TicketTotal totalTickets={totalTickets} totalAmount={totalAmount} />
 
-          <button
+          <ButtonWrapper
             type="submit"
             disabled={totalTickets === 0 || !userName || !userEmail}
-            className="w-full theme-gradient-primary text-white font-bold py-4 px-6 theme-radius-lg theme-transition transform hover:scale-105 disabled:hover:scale-100 disabled:cursor-not-allowed cursor-pointer"
+            className="font-bold py-4 px-6 theme-radius-lg"
           >
             {totalTickets === 0
               ? "Select Tickets"
               : `Confirm Booking - $${totalAmount}`}
-          </button>
+          </ButtonWrapper>
         </form>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { TypeId, type TicketTier } from "../../types";
+import IconButton from "../ButtonWrapper/IconButton";
 
 type TicketSelectionProps = {
   tiers: TicketTier[];
@@ -42,25 +43,23 @@ function TicketSelection({ tiers, quantities, updateQuantity }: TicketSelectionP
                 Quantity:
               </span>
               <div className="flex items-center space-x-3">
-                <button
-                  type="button"
+                <IconButton
                   onClick={() => updateQuantity(tier.id, -1)}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full p-1 transition-colors cursor-pointer"
                   disabled={!quantities[String(tier.id)]}
+                  variant="secondary"
                 >
                   <Minus className="h-4 w-4" />
-                </button>
+                </IconButton>
                 <span className="text-lg font-semibold w-8 text-center">
                   {quantities[String(tier.id)] || 0}
                 </span>
-                <button
-                  type="button"
+                <IconButton
                   onClick={() => updateQuantity(tier.id, 1)}
-                  className="bg-red-600 hover:bg-red-700 text-white rounded-full p-1 transition-colors cursor-pointer"
                   disabled={(quantities[String(tier.id)] || 0) >= tier.available}
+                  variant="primary"
                 >
                   <Plus className="h-4 w-4" />
-                </button>
+                </IconButton>
               </div>
             </div>
           </div>

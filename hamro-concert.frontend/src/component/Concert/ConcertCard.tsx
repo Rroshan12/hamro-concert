@@ -5,6 +5,7 @@ import ConcertImage from "./ConcertImage";
 import ConcertInfo from "./ConcertInfo";
 import ConcertDetails from "./ConcertDetails";
 import TicketTiers from "./TicketTiers";
+import ButtonWrapper from "../ButtonWrapper/ButtonWrapper";
 
 interface ConcertCardProps {
   concert: Concert;
@@ -43,12 +44,9 @@ const ConcertCard = React.memo(function ConcertCard({
         
         <TicketTiers tiers={tiers} />
 
-        <button
-          onClick={() => onBookNow(concert)}
-          className="w-full theme-gradient-primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 cursor-pointer"
-        >
+        <ButtonWrapper onClick={() => onBookNow(concert)} type="button">
           Book Tickets Now
-        </button>
+        </ButtonWrapper>
       </div>
     </CardWrapper>
   );

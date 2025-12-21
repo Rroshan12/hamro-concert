@@ -120,58 +120,89 @@ const spec: OpenAPIV3.Document = {
       },
     },
 
-    "/ticket-bookings": {
+    "/seats/concert/{concertId}": {
+      get: {
+        summary: "Get all seats for a concert",
+        parameters: [
+          { name: "concertId", in: "path", required: true, schema: { type: "string" } }
+        ],
+        responses: { 
+          "200": { 
+            description: "OK",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SeatListResponse" }
+              }
+            }
+          },
+          "404": { description: "Concert not found" }
+        },
+      },
+    },
+
+    "/seats/concert/{concertId}/available": {
+      get: {
+        summary: "Get available seats for a concert",
+        parameters: [
+          { name: "concertId", in: "path", required: true, schema: { type: "string" } }
+        ],
+        responses: { 
+          "200": { 
+            description: "OK",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: { $ref: "#/components/schemas/Seat" }
+                }
+              }
+            }
+          },
+          "404": { description: "Concert not found" }
+        },
+      },
+    },
+
+    "/ticket-bookings/seats": {
       post: {
-        summary: "Create booking (supports multiple tiers per user)",
+        summary: "Book specific seats",
         requestBody: {
           required: true,
           content: {
             "application/json": {
               schema: {
                 type: "object",
-                required: ["userName", "userEmail", "ticketData"],
+                required: ["userName", "userEmail", "seatIds"],
                 properties: {
                   userName: { type: "string" },
                   userEmail: { type: "string", format: "email" },
-                  ticketData: {
+                  seatIds: {
                     type: "array",
                     minItems: 1,
-                    items: {
-                      type: "object",
-                      required: ["ticketTierId", "quantity"],
-                      properties: {
-                        ticketTierId: { type: "integer" },
-                        quantity: { type: "integer", minimum: 1 },
-                      },
-                    },
+                    items: { type: "integer" }
                   },
                 },
               },
-              examples: {
-                single: {
-                  summary: "Single-tier",
-                  value: {
-                    userName: "Alice",
-                    userEmail: "alice@example.com",
-                    ticketData: [{ ticketTierId: 1, quantity: 2 }],
-                  },
-                },
-                multi: {
-                  summary: "Multi-tier",
-                  value: {
-                    userName: "Bob",
-                    userEmail: "bob@example.com",
-                    ticketData: [
-                      { ticketTierId: 2, quantity: 1 },
-                      { ticketTierId: 3, quantity: 4 },
-                    ],
-                  },
-                },
+              example: {
+                userName: "Alice",
+                userEmail: "alice@example.com",
+                seatIds: [1, 2, 3],
               },
             },
           },
         },
-        responses: { "201": { description: "Created" } },
+        responses: { 
+          "201": { 
+            description: "Seats booked successfully",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SeatBookingResponse" }
+              }
+            }
+          },
+          "400": { description: "Bad request - seats unavailable or invalid" },
+          "404": { description: "Concert or seats not found" }
+        },
       },
     },
   },
@@ -200,6 +231,59 @@ const spec: OpenAPIV3.Document = {
           price: { type: "string" },
           total: { type: "integer" },
           available: { type: "integer" },
+        },
+      },
+      Seat: {
+        type: "object",
+        properties: {
+          id: { type: "integer" },
+          concertId: { type: "string" },
+          ticketTierId: { type: "integer" },
+          seatNumber: { type: "string" },
+          row: { type: "integer" },
+          section: { type: "string", enum: ["front", "vip", "ga"] },
+          isBooked: { type: "boolean" },
+          userId: { type: "string", nullable: true },
+          bookedAt: { type: "string", format: "date-time", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+      SeatListResponse: {
+        type: "object",
+        properties: {
+          seats: {
+            type: "array",
+            items: { $ref: "#/components/schemas/Seat" }
+          },
+          totalSeats: { type: "integer" },
+          availableSeats: { type: "integer" },
+          bookedSeats: { type: "integer" },
+        },
+      },
+      SeatBookingResponse: {
+        type: "object",
+        properties: {
+          id: { type: "integer" },
+          userName: { type: "string" },
+          userEmail: { type: "string" },
+          ticketData: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                concertId: { type: "string" },
+                ticketTierId: { type: "integer" },
+                quantity: { type: "integer" },
+                pricePerTicket: { type: "string" },
+                totalAmount: { type: "string" },
+                status: { type: "string" },
+                createdAt: { type: "string", format: "date-time", nullable: true },
+                seatNumbers: { type: "array", items: { type: "string" } },
+              },
+            },
+          },
+          seatIds: { type: "array", items: { type: "integer" } },
         },
       },
     },

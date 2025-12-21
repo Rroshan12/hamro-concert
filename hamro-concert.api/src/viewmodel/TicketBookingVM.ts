@@ -2,7 +2,8 @@ export interface TicketBookingVM {
   id: number;
   userName: string;
   userEmail: string;
-  ticketData: TicketBookingListVM[]
+  ticketData: TicketBookingListVM[];
+  seatIds: number[]; // Required for seat-based bookings
 }
 
 export interface TicketBookingListVM {
@@ -13,4 +14,5 @@ export interface TicketBookingListVM {
   totalAmount: string;
   status: string;
   createdAt?: Date | null;
+  seatNumbers?: string[]; // Seat numbers for seat-based bookings
 }

@@ -10,13 +10,13 @@ import ButtonWrapper from "../ButtonWrapper/ButtonWrapper";
 interface ConcertCardProps {
   concert: Concert;
   tiers: TicketTier[];
-  onBookNow: (concert: Concert) => void;
+  onBookSeat: (concert: Concert) => void;
 }
 
 const ConcertCard = React.memo(function ConcertCard({
   concert,
   tiers,
-  onBookNow,
+  onBookSeat,
 }: ConcertCardProps) {
   const totalAvailable = tiers.reduce((sum, tier) => sum + tier.available, 0);
 
@@ -44,9 +44,11 @@ const ConcertCard = React.memo(function ConcertCard({
         
         <TicketTiers tiers={tiers} />
 
-        <ButtonWrapper onClick={() => onBookNow(concert)} type="button">
-          Book Tickets Now
-        </ButtonWrapper>
+        <div className="flex justify-center">
+          <ButtonWrapper onClick={() => onBookSeat(concert)} type="button">
+            Book Seats
+          </ButtonWrapper>
+        </div>
       </div>
     </CardWrapper>
   );

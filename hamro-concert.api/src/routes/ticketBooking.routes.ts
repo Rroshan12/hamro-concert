@@ -7,6 +7,6 @@ const router = Router();
 const service = new TicketBookingService();
 const controller = new TicketBookingController(service);
 
-router.post("/", controller.create);
+router.post("/seats", controller.bookSeats);
 
 export default router;

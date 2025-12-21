@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import Header from './component/Header';
 import ConcertCard from './component/Concert/ConcertCard';
-import BookingModal from './component/Booking/BookingModal';
+import SeatBookingModal from './component/SeatBooking/SeatBookingModal';
 import Footer from './component/Footer';
 import  { type Concert, type TicketTier } from './types';
 import { getConcerts } from './api/concerts';
@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 
 
 function App() {
-  const [selectedConcert, setSelectedConcert] = useState<Concert | null>(null);
+  const [selectedConcertForSeat, setSelectedConcertForSeat] = useState<Concert | null>(null);
   const { data: concertsPaged, isLoading: concertsLoading } = useQuery({
     queryKey: ['concerts', { page: 1, limit: 50 }],
     queryFn: () => getConcerts({ page: 1, limit: 50 }),
@@ -30,12 +30,12 @@ function App() {
     return (concertId: string) => ticketTiers.filter(tier => tier.concertId === concertId);
   }, [ticketTiers]);
 
-  const handleBookNow = (concert: Concert) => {
-    setSelectedConcert(concert);
+  const handleBookSeat = (concert: Concert) => {
+    setSelectedConcertForSeat(concert);
   };
 
-  const handleCloseModal = () => {
-    setSelectedConcert(null);
+  const handleCloseSeatModal = () => {
+    setSelectedConcertForSeat(null);
   };
 
   return (
@@ -53,16 +53,16 @@ function App() {
                   key={concert.id}
                   concert={concert}
                   tiers={getTiersForConcert(concert.id)}
-                  onBookNow={handleBookNow}
+                  onBookSeat={handleBookSeat}
                 />
               ))}
         </div>
       </main>
-      {selectedConcert && (
-        <BookingModal
-          concert={selectedConcert}
-          tiers={getTiersForConcert(selectedConcert.id)}
-          onClose={handleCloseModal}
+      {selectedConcertForSeat && (
+        <SeatBookingModal
+          concert={selectedConcertForSeat}
+          ticketTiers={getTiersForConcert(selectedConcertForSeat.id)}
+          onClose={handleCloseSeatModal}
         />
       )}
       <Footer />

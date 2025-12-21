@@ -1,15 +1,15 @@
-import { CheckCircle } from 'lucide-react'
-import React from 'react'
+import { CheckCircle } from "lucide-react";
 
-type ConfirmProps = {
-  userEmail: string
-}
+type SeatBookingConfirmProps = {
+  userEmail: string;
+};
 
-function Confirm({ userEmail }: ConfirmProps) {
+function SeatBookingConfirm({ userEmail }: SeatBookingConfirmProps) {
   return (
-   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
-        <CheckCircle className="h-20 w-20 text-green-600 mx-auto mb-4" />
+        <CheckCircle
+         className="h-20 w-20 text-green-600 mx-auto mb-4" />
         <h2 className="text-3xl font-bold text-gray-900 mb-2">
           धन्यवाद! Booking Confirmed
         </h2>
@@ -24,7 +24,7 @@ function Confirm({ userEmail }: ConfirmProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Confirm
+export default SeatBookingConfirm;

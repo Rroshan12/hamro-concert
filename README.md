@@ -97,6 +97,13 @@ node test-multiple-seat-booking.js
 Node.js, TypeScript, Drizzle ORM, Docker, PostgreSQL
 
 
+# Monitoring
+
+for now the exception table is made and log are sent in database table (Instead we can throw is different monitoring tool like grafana, signoz)
+
+DatabaseExpetion middleware is made to catch global exception
+
+
 
 
 
